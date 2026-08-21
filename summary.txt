@@ -1,0 +1,958 @@
+
+
+
+---H1---
+
+
+
+compound data elements = data structures
+
+data constructor 
+	-> Procedural Data Constructors
+	-> Literal Data Constructors
+
+three kinds of procedures on datastructures:
+	-> Accessors
+	-> Mutators
+	-> Operations
+
+Two foremost important properties of algorithms:
+	-> Generality
+	-> Computability
+
+Indeed, “applying a procedure” is one of Scheme’s most fundamental building blocks for writing programs. 
+It is a mechanism that is so inherent to Scheme that we consider it as a primitive algorithmic construction. vb: +, sin
+
+compound algorithm uses algorithm constructors vb: let, lambda
+
+abstraction techniques (=by giving a name to complex things)
+	-> data abstraction (=ADT)
+	-> procedural abstraction (=naming a procedure with a meaningfull name)
+
+An abstract data type is a name for a data type along with a set of procedural types 
+that prescribe the kind of procedures (i.e., constructors, accessors, mutators and operations) 
+that can be applied to the data elements of the data type.
+
+two ways to create ADT's:
+	-> procedural style
+	-> object-based style
+
+name clash
+
+This ability to hide private procedures for users is the entire point 
+of using libraries for implementing ADTs. It is the key to data abstraction.
+
+object-based style advantages over the procedural implementation:
+	-> Encapsulation
+	-> Environment Management
+	-> Code Size
+
+object-based style disadvantages:
+	-> Encapsulation Breached
+	-> Code Complexity
+	-> Space Inefficiency
+
+A data structure whose main purpose is to “store” (i.e., “remember”) data values 
+for later retrieval 7is called a storage data structure.
+
+In other words, they associate keys with values. Therefore, dictionaries are also called associative memories.
+
+ADT dictionary<K V>
+new         ( ( K K → boolean ) → dictionary<K V> )
+dictionary? ( any → boolean )
+insert!     ( dictionary<K V> K V → dictionary<K V> )
+delete!     ( dictionary<K V> K → dictionary<K V> )
+find        ( dictionary<K V> K → V ∪ {#f} )
+empty?      ( dictionary<K V> → boolean )
+full?       ( dictionary<K V> → boolean )
+
+experimental approach is to measuring algorithm performance (vb: time via stopwatch) disadvantages:
+	-> Non-Generality
+	-> Absoluteness
+
+Instead we present an analytical technique that takes all possible inputs into account 
+and that allows us to compare two unrelated performance studies.
+
+Hence we try to determine a function fA(n) that gives us a count for the number of computational steps 
+needed to execute an algorithm A on inputs of size n. 
+This function is known as the performance characteristic of the algorithm.
+
+We will use T((greatest l)) to denote the number of computational steps needed 
+to perform the application of the greatest procedure with l as its argument.
+	
+	-> Worst-case Analysis
+	-> Best-case Analysis
+	-> Average-case Analysis
+
+Big Theta = Θ = worst- + best-case met boven en ondergrens
+Big Oh = O = worst-case met bovengrens
+Big Omega = Ω = best-case met ondergrens
+
+Since log⁡ ( a^b ) = b log ⁡ ( a ), we can prove that log a ⁡ ( n ) = log ⁡ ( n ) / log ⁡ ( a ).
+Hence, O ( log a ( n ) ) = O ( log ⁡ ( n ) ) since the constant 1 log ⁡ ( a ) is of no importance.
+
+O(f(if c t e) (n)) = O (max ⁡{fc(n), ft(n), fe(n)}). 
+Evaluating an if expression causes the condition c to be evaluated, 
+followed by the evaluation of t or e. Hence, the performance characteristic 
+is fc(n) + ft(n) or fc(n) + fe(n). 
+Hence, we have to take the maximum of these three performance characteristics.
+
+Rule of Thumb: If we have a recursive procedure that takes an argument the input size of which depends on n, 
+then first determine the performance characteristic O(b(n)) for the body of the procedure 
+without taking the recursive procedure calls into account. Then determine an estimate r(n) 
+for the number of recursive calls (depending on n ) that will be made. The performance characteristic 
+for the entire recursive procedure will be O(b(n) * r(n)).
+
+
+
+---H2---
+
+
+
+String comparison operation	Functionality
+(string=? s1 s2)	String equality
+(string-ci=? s1 s2)	String equality, case insensitive
+(string<? s1 s2)	String before
+(string>? s1 s2)	String after
+(string<=? s1 s2)	String before-equal
+(string>=? s1 s2)	String after-equal
+(string-ci<? s1 s2)	String before, case insensitive
+(string-ci>? s1 s2)	String after, case insensitive
+(string-ci<=? s1 s2)	String before-equal, case insensitive
+(string-ci>=? s1 s2)	String after-equal, case insensitive
+
+proper prefix = als de prefix niet gelijk aan het hele woord is
+
+QuickSearch Alorithm
+
+My stepsister prefers stepping.
+   stepping
+
+We soon find out that #\s doesn’t match #\p. We therefore consider ct=#\e. 
+Since the character occurs in the pattern, we align it correctly:
+
+My stepsister prefers stepping.
+         stepping
+
+Again, a mismatch between #\p and #\r is encountered. This time ct=#\f. 
+Since the character does not occur in the pattern, this allows us to slide the pattern past ct:
+
+My stepsister prefers stepping.
+                  stepping
+
+This time, an immediate mismatch between #\s and #\e makes us consider ct=#\p. 
+Because #\p occurs twice in the pattern, we use the rightmost occurrence. 
+Choosing another occurrence is tempting (because it makes the algorithm go faster) but would result 
+in overshooting the solution (check this!).
+
+My stepsister prefers stepping.
+                      stepping
+
+shift table
+between the smallest and the biggest ASCII
+For the characters that do not occur in the pattern (such as for example #\f, the shift is np + 1
+The table contains max-ascii − min-ascii + 1 entries. 
+Notice that the table is a Scheme vector that is necessarily indexed starting at index 0 and ending at index max-ascii − min-ascii. 
+This is the reason why we have to “normalize” a given ASCII value when looking it up in the table; 
+i.e. we subtract min-ascii in order to obtain an index that lies in the range of the vector.
+After having created the table, (fill-table 0) traverses the pattern a second time, from left to right. 
+For every character it encounters at a certain index, np minus index is written into the corresponding entry 
+in the shift table. For instance, if an #\a is encountered at the third position in a pattern of length 
+10, then the table entry that corresponds to the #\a contains 7.
+This means that the pattern can be shifted 7 positions to the right after encountering a mismatch where 
+ct equals #\a. By filling the vector from left to right we guarantee that only the position 
+in the pattern of the rightmost occurrence of a character is remembered in the vector.
+
+This QuickSearch has the potential of exhibiting sublinear behavior: O( N +  nt/(n p + 1)) in the best case. 
+The first N comes from the work needed to establish the shift table. 
+By analyzing the code of compute-shift-function, we observe that a vector has to be initialized  (all entries are taken to be (+ n-p 1)). 
+The size of the vector depends on the number of different characters in the pattern. 
+After initializing the vector, the pattern is traversed in order to fill the vector. 
+Hence N = max ⁡ ( δ p , n p ) where δ p is the number of different characters occurring in the pattern (this is also known as the alphabet size of the pattern). 
+The second term nt/(n p + 1) comes from the fact that, in the best case, the pattern immediately gives rise 
+to a mismatch for each and every alignment and the character c t following the alignment does not occur in the pattern. 
+This results in a n p + 1 shift for every comparison.
+It is not hard to come up with a worst-case example that shows that QuickSearch is actually in O(np * nt).
+
+KMP
+prefix and suffix
+each iteration move i-p - k further
+with k the length of the prefix in the pattern that is a suffix of the current alignment
+
+lalala or lalalala is what I like to sing
+lala or lalala
+
+mismatch for l and " ", so if we would shift passed i-t + i-p
+
+lalala or lalalala is what I like to sing
+    lala or lalala
+
+we would overshoot a possible match, we need to shift k=2 back,
+
+
+lalala or lalalala is what I like to sing
+  lala or lalala
+
+sigma-table σ = failure function
+By convention we define (sigma 0) to be −1. 
+This makes the fourth branch of the KMP algorithm evaluate the expression 
+(+ i-t (- i-p (sigma i-p))) to (+ i-t 1) whenever i-p is 0. 
+In other words, just like the brute-force algorithm, 
+the KMP algorithm shifts the pattern one single position to the right whenever no characters match.
+
+https://canvas.vub.be/courses/36895/files/folder/slides?preview=2272980
+slide 26
+
+
+
+---H3---
+
+
+
+fast random access property of vectors
+vectors: limited size, adding => copying to bigger vector
+pairs: reference-by-value, no reference-to-last, non generic member, eq?
+solution: headed Scheme lists with extra info (vb: length opgeslagen of reference naar last cons)
+
+We define a linear data structure as a data structure in which each data element has a unique position. 
+The positions are linearly organized: this means that each position has a unique next position as well 
+as a unique previous position. There are two exceptions to this rule: the first position is a special 
+position that has no previous position and the last position is a special position that has no next position. 
+A data structure that satisfies these properties will be referred to as a positional list.
+Also notice that nothing in our definition prescribes that the positions should be numeric: 
+a position is an abstract entity that is solely defined in terms of its neighboring positions.
+
+
+
+ADT positional-list<V P>
+
+new
+  ( ( V V → boolean) → positional-list<V P> )
+from-scheme-list 
+  ( pair ( V V → boolean) → positional-list<V P>)
+positional-list?
+  ( any → boolean )
+length
+  ( positional-list<V P> → number )
+full?
+  ( positional-list<V P> → boolean )
+empty?
+  ( positional-list<V P> → boolean )
+map 
+  ( positional-list<V P> 
+     ( V → V') 
+     ( V' V' → boolean) → positional-list<V' P> )
+for-each
+  ( positional-list<V P> ( V → any ) → positional-list<V P> )
+first
+  ( positional-list<V P> → P )
+last
+  ( positional-list<V P> → P )
+has-next?
+  ( positional-list<V P> P → boolean )
+has-previous?
+  ( positional-list<V P> P → boolean )
+next
+  ( positional-list<V P> P → P )
+previous
+  ( positional-list<V P> P → P )
+find
+  ( positional-list<V P> V → P ∪ { #f } )
+update!
+  ( positional-list<V P> P V → positional-list<V P> ) 
+delete!
+  ( positional-list<V P> P → positional-list<V P> ) 
+peek
+  ( positional-list<V P> P → V )
+add-before!
+  ( positional-list<V P> V . P → positional-list<V P> )
+add-after!
+  ( positional-list<V P> V . P → positional-list<V P> )
+
+However, in contrast to for-each, map returns a new positional list
+
+In other words, we add the element to the front of the list. Similarly, 
+calling add-after! on a non-empty list without providing a position adds the value after 
+all existing positions, i.e., to the rear of the list.
+
+from-scheme-list performance depence on add-after!
+
+1 Representation
+2 Verification
+3 Navigation
+4 Manipulation
+
+Procedure	Performance Characteristic
+from-scheme-list	O(n)
+map			O(n)
+for-each		O(n)
+find			O(n)
+delete!			O(max{ffirst, fhas-next?, fdetach-first!, fdetach-last!, fdetach-middle!})
+add-before!		O(max{ffirst, fattach-first!, fattach-middle!, fprevious})
+add-after!		O(max⁡{fattach-last!, fattach-middle!})
+
+chasing pointers
+
+linked list positional list implmentation uses the cons cells as position hence position = Pair
+
+
+
+Operation	  Vector  Linked  Double_Linked_1  Double_Linked_2(augmented)
+new		  O(1)	  O(1)	  O(1)		   O(1)
+from-scheme-list  O(n)    O(1)    O(n)             O(n)
+length		  O(1)    O(n)    O(n)             O(1)
+full?		  O(1)	  O(1)	  O(1)		   O(1)
+empty?	 	  O(1)	  O(1)	  O(1)		   O(1)
+map		  O(n)	  O(n)	  O(n)		   O(n)
+for-each	  O(n)    O(n)    O(n)		   O(n)
+first	          O(1)	  O(1)	  O(1)		   O(1)
+last		  O(1)    O(n)    O(n)		   O(1)
+has-next?	  O(1)	  O(1)	  O(1)		   O(1)
+has-previous?	  O(1)	  O(1)    O(1)             O(1)
+next              O(1)    O(1)    O(1)		   O(1)
+previous	  O(1)    O(n)    O(1)             O(1)
+find	          O(n)    O(n)    O(n)             O(n)
+update!	          O(1)    O(1)    O(1)             O(1)
+delete!	          O(n)    O(n)    O(1)             O(1)
+peek	          O(1)    O(1)    O(1)             O(1)
+add-before!	  O(n)    O(n)    O(1)             O(1)
+add-after!	  O(n)    O(n)    O(n)             O(1)
+
+
+
+ADT ranked-list<V>
+
+new
+  ( ( V V → boolean) → ranked-list<V> )
+from-scheme-list
+  ( pair ( V V → boolean ) → ranked-list<V> )
+ranked-list?
+  ( any → boolean )
+length
+  ( ranked-list<V> → number )
+full?
+  ( ranked-list<V> → boolean )
+empty?
+  ( ranked-list<V> → boolean )
+find
+  ( ranked-list<V> V → number )
+peek-at-rank
+  ( ranked-list<V> number → V )
+update-at-rank!
+  ( ranked-list<V> number V → ranked-list<V> )
+delete-at-rank!
+  ( ranked-list<V> number → ranked-list<V> )
+add-at-rank!
+  ( ranked-list<V> V . number → ranked-list<V> )
+
+A position then always refers to a position in a certain list at this particular moment in time. 
+Such positions are called ranks.
+One of the elements in the data structure has rank 0. 
+The rank for all other elements in the data structure is the number of data elements t
+hat precede that data element, i.e. the number of elements that have a smaller rank.
+
+
+
+ADT list-with-current<V>
+
+new
+  ( ( V V → boolean ) → list-with-current<V> )
+from-scheme-list
+  ( pair ( V V → boolean ) → list-with-current<V> )
+list-with-current?
+  ( any → boolean )
+length
+  ( list-with-current<V> → number )
+full?
+  ( list-with-current<V> → boolean )
+empty?
+  ( list-with-current<V> → boolean )
+set-current-to-first!
+  ( list-with-current<V> → list-with-current<V> )
+set-current-to-last!
+  ( list-with-current<V> → list-with-current<V> )
+current-has-next?
+  ( list-with-current<V> → boolean )
+current-has-previous?
+  ( list-with-current<V> → boolean )
+set-current-to-next!
+  ( list-with-current<V> → list-with-current<V> )
+set-current-to-previous!
+  ( list-with-current<V> → list-with-current<V> )
+has-current?
+  ( list-with-current<V> → boolean )
+find!
+  ( list-with-current<V> V → list-with-current<V> )
+update!
+  ( list-with-current<V> V → list-with-current<V> )
+peek
+  ( list-with-current<V> → V )
+delete!
+  ( list-with-current<V> → list-with-current<V> )
+add-before!
+  ( list-with-current<V> V → list-with-current<V> )
+add-after!
+  ( list-with-current<V> V → list-with-current<V> )
+
+
+
+Sentinel Searching
+we observe a conditional expression that has two stop conditions: 
+find stops looping whenever the element is found or whenever the end of the list is reached.
+We can avoid the second test by making sure that the key is guaranteed to be contained in the list. 
+Technically, this is achieved by adding the key to the positional list after the last position of the list.
+The advantage has its price though: the attach-last! and detach-last! operations have to be in O(1).
+
+
+
+ADT sorted-list<V>
+
+new               
+  ( ( V V → boolean) ( V V → boolean) → sorted-list<V>)
+from-scheme-list
+  ( pair ( V V → boolean) ( V V → boolean) → sorted-list<V>)
+sorted-list?
+  ( any → boolean )
+length
+  ( sorted-list<V> → number )
+empty?
+  ( sorted-list<V> → boolean )
+full?
+  (sorted-list<V> → boolean )
+find!
+  ( sorted-list<V> V → sorted-list<V> )
+delete!						zet current op -1
+  ( sorted-list<V> → sorted-list<V> )
+peek
+  ( sorted-list<V> → V )
+add!
+  ( sorted-list<V> V → sorted-list<V> )
+set-current-to-first! 
+  ( sorted-list<V> → sorted-list<V> )
+set-current-to-next!
+   ( sorted-list<V> → sorted-list<V> )
+has-current?
+   ( sorted-list<V> → boolean )
+current-has-next?
+   ( sorted-list<V> → boolean )
+
+Binary Search O(log⁡(n))
+The idea of binary search is extremely clever. Since a list is sorted, 
+we can divide it into two halves and determine whether the search key is to be found 
+in the first half or in the second half of the list.
+The ability of vectors to access their entries in O(1)
+is a crucial property for the well-functioning of tis algorithm.
+Hence, we are looking for the number of times, say k, that a list of size n
+can be halved before the length of the remaining sublist is 1. In other words, we look for the 
+k such that n/(2^k) = 1. Solving this equation for k, we get 
+k = ⌈log2(n)⌉
+
+
+
+ADT ring
+
+new               ( ∅ → ring )
+from-scheme-list  ( pair → ring )
+ring?             ( any → boolean )
+add-after!        ( ring any → ring )
+add-before!       ( ring any → ring )
+shift-forward!    ( ring → ring )
+shift-backward!   ( ring → ring )
+delete!           ( ring → ring )
+update!           ( ring any → ring )
+peek              ( ring → any )
+length            ( ring → number )
+
+single linked implementation
+
+Rings have an inherent notion of “a current” which always refers to a meaningful value.
+The newly added data value plays the role of the current after the operation has finished execution.
+The operation delete! removes the current element from the ring and makes the current refer to the next element in the ring.
+
+
+
+---H4---
+
+
+
+ADT stack
+
+new     ( ∅ → stack )
+stack?  ( any → boolean )
+push!   ( stack any → stack )
+top     ( stack → any )
+pop!    ( stack → any )
+empty?  ( stack → boolean )
+full?   ( stack → boolean )
+
+LIFO
+Since the result of push! is a stack again, expressions like (push! (push! s 1) 2) are possible = cascaded expressions
+top = peeks
+Θ(n) memory cells in the vectorial implementation, Θ(2n) for linked,
+both implementation have a O(1) for all procedures
+stack-pair = The idea of the ADT consists of using the wasted memory to host a second stack. 
+	     The vector contains one stack that “grows to the right” in the vector, 
+	     and a second stack that “grows to the left” in the same vector. 
+
+
+
+ADT queue
+
+new       ( ∅ → queue )
+queue?    ( any → boolean )
+enqueue!  ( queue any → queue )
+peek      ( queue → any )
+serve!    ( queue → any )
+empty?    ( queue → boolean )
+full?     ( queue → boolean )
+
+FIFO
+Checking whether or not a queue is empty or full is a bit tricky. A queue is considered full when its rear bumps into its head. 
+The problem is that a queue is also considered empty if the head index is equal to the rear index. 
+In order to be able to make a distinction between empty queues and full queues, 
+we therefore “waste” one vector entry by considering the queue full whenever the successor 
+of the rear bumps into the head
+
+
+
+ADT priority-queue<P>
+
+new             ( ( P P → boolean ) → priority-queue<P> )
+priority-queue? ( any → boolean )
+enqueue!        ( priority-queue<P> any P → priority-queue<P> )
+peek            ( priority-queue<P> → any )
+serve!          ( priority-queue<P> → any )
+full?           ( priority-queue<P> → boolean )
+empty?          ( priority-queue<P> → boolean )
+
+This principle is sometimes referred to as HPFO: highest priority first out
+
+Operation	Sorted List	Positional List		Heap
+enqueue!	O(n)		O(1)			O(log⁡(n))
+serve!		O(1)		O(n)			O(log⁡(n))
+
+
+
+ADT heap<V>
+
+from-scheme-vector  ( vector ( V V → boolean ) → heap<V> )
+new                 ( number ( V V → boolean ) → heap<V> )
+full?               ( heap<V> → boolean )
+empty?              ( heap<V> → boolean )
+insert!             ( heap<V> V → heap<V> )
+delete!             ( heap<V> → V )
+peek                ( heap<V> → V )
+length              ( heap<V> → number )
+
+Using heaps, both serve! and enqueue! exhibit a performance that is in O(log⁡(n))
+heap condition: for all i>0 we have ei < e2i and ei < e2i+1
+
+It is important to understand that the elements in a heap are not necessarily sorted, 
+even though any sorted sequence is also a valid heap since the elements of a sorted sequence 
+automatically satisfy the heap condition
+
++-= complete binary tree
+
+Similarly, given any index i in the vector, then the parent node of the node residing 
+at that index resides in vector entry ⌊i/2⌋. (= naar beneden afronden)
+
+the root node of the heap always contains the smallest element of the heap.
+
+The height of the node is defined as the number of arrows in the path.
+
+Properties of Heaps
+height = ⌊log2(n)⌋
+a heap with n elements has ⌈n/2⌉ leaves
+a heap with n nodes there are maximum ⌈n/2^(h+1)⌉ elements residing at height h
+
+removing root element -> root replaced with very last element -> root to big, violates heap condition ->
+ -> root has to be sifted down
+
+adding element to the rear -> violates heap condition? -> element has to be Sifting up
+
+sift-up does not switch when elements are equal !check to be sure!
+sift-down does switch when elements are equal !check to be sure!
+
+Operation	Performance
+new		O(1)
+empty?		O(1)
+full?		O(1)
+from-vector	O(n)
+insert!		O(log(n))
+delete!		O(log(n))
+peek		O(1)
+length		O(1)
+
+then the n/2 last elements of the vector form the bottom level (called the yield) of the tree
+
+
+
+---H5---
+
+simple algorithms	advanced algorithms	linearalgorithms
+O(n^2)			O(n*log(n))		O(n)
+
+three options: 
+by reference = switch the reference of the elements inside the vector to order them
+by copy and = when fields of songs are saved not per object but per column attribute, hard switch the property fields
+by construction of a new index vector = or instead of by copy, create a new index vector that has an ordered reference to the right element at each index
+
+In-place sorting algorithms are sorting algorithms that require no additional memory apart 
+from the memory that is already occupied by the input data structure = Θ(1)
+
+Stable sorting algorithms are algorithms that respect the original order of records that have identical keys.
+
+
+simple algorithms:
+
+
+bubble sort or exchange sort
+begin bij index 0 en blijf vergelijken en desnoods swappen met de volgende positie
+blijf dit herhalen maar telkens met als einde het vorige einde -1
+er wordt vanachter namelijk een gesorteerd deel opgebouwd
+outerloop 1:
+50 10 40 30 20
+10 50 40 30 20 (1 innerloop)
+10 40 50 30 20
+10 40 30 50 20
+10 40 30 20 50
+
+outerloop 2:
+10 40 30 20 50
+10 40 30 20 50
+10 30 40 20 50
+10 30 20 40 50
+
+outerloop 3:
+10 30 20 40 50
+10 30 20 40 50
+10 20 30 40 50
+
+outerloop 4:
+10 30 20 40 50
+10 20 30 40 50
+
+
+
+insertion sort
+begin met het voorlaatste element en swap constant zoals in bubblesort
+tot hij juist staat in het gesorteerde deel (vanachter in de vector)
+doe vanachter naar voor tot het eerste element in de vector
+outerloop 1:
+50 10 40 30 20
+50 10 40 20 30
+
+outerloop 2:
+50 10 40 20 30
+50 10 20 40 30 (1 innerloop)
+50 10 20 30 40
+
+outerloop 3:
+50 10 20 30 40
+
+outerloop 4:
+50 10 20 30 40
+10 50 20 30 40
+10 20 50 30 40
+10 20 30 50 40
+10 20 30 40 50
+
+
+
+Selection Sort
+zoek telkens het kleinste element uit het ongesorteerde deel en
+voeg deze toe achteraan het gesorteerde deel (dat zich in het begin
+van de vector bevindt) door te swappen
+outerloop 1:
+(kleinste element 10, nog geen gesorteerd deel swap met index 0)
+50 10 40 30 20
+10 50 40 30 20
+
+outerloop 2:
+10 50 40 30 20
+10 20 40 30 50 (1 innerloop)
+
+outerloop 3:
+10 20 40 30 50
+10 20 30 40 50
+
+outerloop 4:
+10 20 30 40 50
+
+
+advanced algorithms:
+
+
+Quicksort
+
+pick pivot
+partitioning phase
+recursively quicksort left and right
+
+is a divide and conquer algorithms:
+- Divide
+The problem P is divided into two or more similar subproblems p1, ..., pk.
+
+Conquer
+The algorithm is recursively called for some or all subproblems p1, ..., pk. 
+This results in solutions s1, ..., sk for each of the subproblems.
+
+Combine
+The solutions for the subproblems s1, ..., sk is subsequently combined in order to compose a solution S for P.
+
+
+
+---H6---
+
+A tree is a collection of data elements residing in nodes, 
+the organization of which satisfies the following conditions:
+- The empty tree is a tree that does not contain any nodes at all.
+- Any non-empty tree has a unique root node.
+- Every node has a direct reference to a number of nodes that are called the children of that node. 
+  The node itself is called the parent node of the children. 
+  A node's parent node is the only node referring to that node.
+
+For a node n in a tree, we define its arity as the number of children it has. 1-ary nodes have one child
+
+ADT binary-tree
+    
+null-tree
+   binary-tree
+new
+   ( any binary-tree binary-tree → binary-tree )
+null-tree?
+   ( binary-tree → boolean )
+left!
+   ( binary-tree binary-tree → binary-tree )
+left
+   ( binary-tree → binary-tree )
+right!
+   ( binary-tree binary-tree → binary-tree )
+right
+   ( binary-tree → binary-tree )
+value!
+   ( binary-tree any → binary-tree )
+value
+   ( binary-tree → any )
+
+
+threaded trees
+Threaded trees are binary trees in which each node that has no right child uses that “wasted” pointer 
+to refer to the “next node” for some particular definition of “next'. The pointer is called a thread.
+
+Tree Traversals:
+1 depth-first traversals
+	-> pre-order
+		1
+	      |   |
+	      2   3
+	-> post-order
+		3
+	      |   |
+	      1   2
+	-> in-order
+		2
+	      |   |
+	      1   3
+2 breadth-first traversals
+iteratieve implementatie met gebruik van een queue, 
+zo zijn de parents eerder toegevoegd (in vorige itteratie) dan de kinderen,
+zodat eerst de siblings geserved! gaan worden
+
+
+ADT BST< V >
+
+new
+   ( ( V V → boolean) 
+     ( V V → boolean) → BST < V > )
+binary-search-tree?
+   ( any → boolean )
+find
+   ( BST < V > V → V 
+∪
+ { #f } )
+insert!
+   ( BST < V > V → BST < V > )
+delete!
+   ( BST < V > V → BST < V > )
+
+A binary search tree (or BST for short) is a binary tree that satisfies the following BST condition. 
+For every node n we have:
+- if n has a left child then all data elements of that left child are “smaller” 
+  than the data element residing at n.
+- if n has a right child, then all data elements of that right child are “greater” 
+  than the data element residing at n.
+
+If the node is a node with two subtrees, then the situation is more complex. We cannot just remove the node since the parent can only refer to one node and we have two of them. The standard way to solve this is to replace the node by another node that is also guaranteed to satisfy the BST condition and that requires the least possible number of modifications to both subtrees of the node we are deleting. Such a node is found in the leftmost position of the right subtree of the node to be deleted. The leftmost node in the right subtree is a node that contains a value that is the immediate successor of the value sitting in the node to be deleted (verify this!). Furthermore, it is a node that is guaranteed to have no left subtree since it is the leftmost node. As a result it is easy to remove that node from the right subtree by simply making its parent refer to its one and only subtree. This is depicted in Figure 6.15. Finding the leftmost node of the right subtree is accomplished by find-leftmost. It works its way down the right subtree in a leftmost way. Having reached the leftmost node, its value is used to replace the value sitting in the node to be deleted. Hence, the node to be deleted is not really deleted. Its contents is simply replaced by the value sitting in the leftmost node of the right subtree. That node is deleted by making its parent refer to its right subtree. Scheme will garbage collect the node.
+
+In the worst-case, we have a degenerated tree in which every node has only one child. 
+This is actually a linked list such that h = n. 
+Hence, the worst-case performance characteristics for the operations is in O(n).
+
+dictionary ADT gebruikt ofwel
+ - vectorial implementation of sorted list
+ - linked implementation of binary search tree
+
+three possibilities for degenerated tree:
+ - When the elements of a binary search tree have been inserted in ascending order, the resulting tree is degenerated “to the right”
+ - When the elements of the binary search tree have been inserted in descending order, the tree is degenerated “to the left”
+ - Other schemes are possible as well: when the elements are inserted alternatingly outside-in, the tree is a linked list with alternating left branches and right branches
+
+
+AVL Trees
+we call a tree reasonable balanced when the difference in height between two subtrees 
+of a node is never greater than 1. Trees that satisfy this definition are known as AVL Trees.
+Whenever the AVL condition is violated, the adapted insertion and deletion procedures apply a number of rebalancing procedures on the tree.
+So we don't possibly get degenerated trees if we call delete or insert!
+every node stores a balancing tag. We have three possible tags, namely balanced, Lhigh and Rhigh.
+
+rebalancing trees is accomplished by means of rotations
+double rotation can be thought of as a combination of two consecutive single rotations
+a double rotation that consists of a single rotation to the right followed by a single rotation to the left.
+
+Figure 6.19:  A Single Rotation to the Left
+https://soft.vub.ac.be/~jnicolay/courses/ad1/html-dynamic/img/Chapter6/singlerotation.png
+
+Figure 6.20:  A Double Rotation Right-then-Left
+https://soft.vub.ac.be/~jnicolay/courses/ad1/html-dynamic/img/Chapter6/doublerotation.png
+
+Table 6.2:  Comparative Dictionary Performance Characteristics
+Operation	Sorted List (Vector)	Sorted List (Linked)	Double Linked List	BST		AVL
+insert!
+(worst)		O(n)			O(n)			O(1)			O(n)		O(log(n))
+(average)	O(n)			O(n)			O(1)			O(log(n))	O(log(n))
+delete!
+(worst)		O(n)			O(n)			O(n)			O(n)		O(log(n))
+(average)	O(n)			O(n)			O(n)			O(log(n))	O(log(n))
+find	
+(worst)		O(log(n))		O(n)			O(n)			O(n)		O(log(n))
+(average)	O(log(n))		O(n)			O(n)			O(log(n))	O(log(n))
+
+
+
+---H7---
+
+
+
+the idea presented in this chapter is to apply a special function h 
+to the key in order to compute the location of the key in the vector-based data structure. 
+The data structure is known as a hash table and h is known as a hash function
+
+First, a function h is needed that can be applied to any given key in order to transform that key to a number. 
+This function is known as a hash function. It is crucial that the hash function is in O(1)
+
+A hash function that avoids collisions is called a perfect hash function
+
+conflict resolution strategy = How can we make sure that two key-value pairs that have the same home address can be stored in the hash table anyhow?
+
+A central concept in these studies is a hash table's load factor α 
+is the ratio that compares the number of elements contained in the hash table
+with the number of entries it supplies, i.e. α = n/M.
+Stated otherwise, at any moment in time, a hash table is α × 100 percent filled
+
+In order to keep the chances for collisions under control, it is advisable to keep the load factor below 1.
+As we will see, a good choice is to keep the load factor below 75%.
+If it exceeds this threshold, then it is wise to make the hash table grow by rehashing all the elements into a new table.
+
+Collision resolution two groups:
+	-> external chaining
+		This turns the hash table into a vector of linked lists, also called buckets.
+	-> open addressing.
+
+
+external chaining
+
+It boils down to the fact that the probability of a key to end up in one particular bucket is 1/M.
+Given the fact that n elements reside in the dictionary, we can expect an average length of n/M = α for every bucket.
+
+Operation	Performance
+find		O(1 + α)
+insert!		O(1 + α)
+delete!		O(1 + α)
+
+Let us have a look at what happens when we use this function with M = 25 to store the numbers of the set S = { 0 , 5 , 10 , 15 , 20 , . . . , 100 } . For the moment we assume that h ( k ) = k . It is our goal here to study the role of M instead of h . Given these premises, we notice that all elements of the set { 0 , 25 , 50 , 75 , 100 } end up at f ( k ) = 0 . All elements of the set { 5 , 30 , 55 , 80 } end up at f ( k ) = 5 . As a result, all elements of S end up at the entries 0 , 5 , 10 , 15 and 20 . All other entries (i.e. 1 , 2 , 3 , 4 , 6 ,... ) of the table remain unused. This phenomenon is known as funneling (a subset of) the input ends up in a subset of the table entries. It is exactly the opposite of what we try to achieve with hashing, namely to uniformly distribute the key-value pairs as much as possible over the entire table in order to make collisions as unlikely as possible. In order to understand the funneling phenomenon, consider the situation in which the numbers h ( k ) and M have a multiplicative factor γ in common. In other words, let us assume that h ( k ) = γ . r h ( k ) and M = γ . r M . Recall that, by definition, a = b mod N if and only if a = β . N + b for some β (which can be negative!). Then f ( k ) = β . M + h ( k ) = β . γ . r M + γ . r h ( k ) = γ . X . Hence, all hash values h ( k ) that have a factor γ in common with M end up at some multiple of γ . In the above example, all hashed keys that have the factor 5 in common with 25 end up at some multiple of 5 . Hence, how do we choose an M that has no factors in common with any hash value? The answer is to select a prime number for M . The best values for M turn out to be primes that are not too close to exact powers of 2 . Another possibility to make sure that M and h ( k ) have no factors is common is to make sure that 2 is the only factor of M (i.e. we choose M to be a perfect power of two) and that h ( k ) does not have two as a factor (i.e. is an odd number).
+
+
+Open Addressing Methods
+
+Upon encountering a collision for a certain key-value pair, the idea of open addressing methods consists of searching the hash table in order to find a free entry in which we can store that key-value pair.
+In order to be able to store elements elsewhere in the same table, keys are rehashed whenever their home address turns out to be a location that is already occupied. When the new location that is obtained after rehashing is occupied as well, the rehashing algorithm is repeated, until a location is found that is still available. Every such trial in the table is called a probe. Several such probes may be necessary. The result is called a probe sequence. Clearly, generating the probe sequence by subsequent rehashing is in fact a search process in a linear list. Hence, the longer the probe sequences, the worse the performance of the hash table's operations.
+
+- linear rehashing or linear probing
+
+h′(k,i)=(h(k)+i.c)modMwherei∈{1,2,3,4,...}
+Very often c is simply chosen to be 1. This is called single-slot stepping.
+
+c and M must be relatively prime: 
+- If c and M share a common factor (γ), the probe sequence will only cover a subset of the table, 
+  repeatedly visiting the same positions (a phenomenon called "funneling"). 
+- If c and M are relatively prime (no common factors other than 1), 
+  the probing sequence will eventually cover all positions in the table, 
+  ensuring that every slot can be visited.
+
+Deleting an entry by marking it as empty causes issues in linear probing. This is because other keys might depend on the deleted key to maintain their probe sequence.
+Handling Deletions Problem with Simply Marking as Empty: 
+Deleting an entry by marking it as empty causes issues in linear probing. 
+This is because other keys might depend on the deleted key to maintain their probe sequence. 
+For example: 
+Key k0 ​hashes to position p0. 
+Key k1 ​collides with k0 ​and is rehashed to position p1. 
+Key k2 ​collides with both k0 ​and k1 ​and is rehashed to position p2. 
+If k0 ​is deleted and marked as empty, k1 ​
+and k2 ​can no longer be found correctly because the probe sequence breaks at p0.
+
+Solutions to Deletion To avoid this issue, two strategies can be used: 
+1 Mark Deleted Entries with a Special Flag: 
+  Instead of marking a slot as "empty," mark it as "deleted." known as a tombstone
+  This allows the probe sequence to continue but still makes the slot available for future insertions. 
+2 Rehash After Deletion: Recompute the hash values and rebuild the probe sequence 
+  for keys that depend on the deleted entry. However, this is computationally expensive.
+
+This implementation of linear rehashing has a very important drawback: it makes find no longer dependent on the load factor itself but on previous values of the load factor. When deletions occur frequently, the hash table will be heavily polluted with 'deleted tombstones. This will have an effect on the efficiency. As a result it might be advisable to clean up the table every now and then by considering all keys in the table and by inserting them in a newly created hash table. Clearly, this is an O(n) operation.
+
+The second implementation of linear rehashing properly deletes the element to be deleted from the hash table. Unfortunately, this deletion method is only possible for linear probing with single-slot stepping (i.e. c = 1).
+
+This proper deletion algorithm is implemented by the delete! procedure shown below. The idea is to iterate towards the address of the association to be deleted and to replace the association by the next association of the probe sequence that begins at that association. This process is repeated and causes all associations of that probe sequence to be moved “to the left”. This process is very similar to the storage move process that was discussed in Section 3.2.5. In other words, we traverse the entire probe sequence that starts at that home address in order to copy the elements of the probe sequence one position “backward” in the probe sequence. This is accomplished by the storage-move procedure shown below. It returns the address of the last association of the probe sequence which is subsequently filled with 'empty.
+aution is required when copying associations: elements encountered in the probe sequence whose home address happens to belong to the probe sequence do not have to be copied. They belong to a different probe sequence that happens to align with the probe sequence under consideration. Hence, the iteration computes the home address k for every element encountered in the probe sequence. If the home address itself (circularly) lies between prev and next, then the element is skipped and we “follow the next pointer”
+
+
+Clustering
+
+In our discussion of the proper deletion procedure we have already explained that elements occurring in one probe sequence can also be part of other probe sequence. This is called clustering. We distinguish between two kinds of clustering:
+- Primary Clustering
+	means that, once two keys k1 and k2 (with a distinct home address) rehash to the same address h somewhere along their probe sequences, then the rest of their probe sequences will be identical as well. Hence, primary clustering means that two different probe sequences “stick together” as soon as they have “met” because they happen to have one single rehashing address in common. Linear probing suffers a lot from primary clustering.
+- Secondary Clustering
+	is a second phenomenon that makes probes sequences merge. Given two keys k1 and k2 that have an identical home address h(k1)=h(k2). We speak about secondary clustering when the probe sequences of the keys cluster: for all i, we have h′(k1,i)=h(k2,i). In other words, secondary clustering means that the two probe sequences of keys have joined together and never bifurcate again. Linear probing suffers from secondary clustering as well.
+
+
+quadratic rehashing or quadratic probing
+Instead of taking a constant c to bridge the gap between two consecutive probes, we make the step size increase for every rehash. This can be done by allowing the step size to grow quadratically
+solves primary clustering but not secondary
+
+Double Hashing
+Double hashing can be considered as a variant of linear rehashing, but for which the step size is recomputed in every iteration of the rehashing phase. In other words, the constant c of the linear probing method is replaced by a value that depends on the key. To achieve this, two separate hash functions h1 and h2 are used:
+Double hashing avoids both primary clustering and secondary clustering since the step-size to be taken is recomputed again and again for every distinct key, whereas the step size was identical for all keys in linear rehashing.
+
+We can assure that M and h2(k) are relative prime.
+Double hashing performs much better than linear probing or quadratic probing. It can be shown that linear probing and quadratic probing use Θ(M) distinct probe sequences, whereas double hashing generates about Θ(M^2) distinct probe sequences.
+(define (rehash key address h2 M)
+  (modulo (+ address (h2 key)) M))
+the step isn't incremented or static but determened by hashing the key with h2 and adding that step growth
+
+
+Good Hash Functions:
+Two phenomena make it hard to come up with good hash functions:
+
+Funnelling
+is the phenomenon which causes entire parts of the table never to be considered for (some subset of) the keys. Whenever hashing a key, the possibility arises that we keep on stepping in circles in the table even though there is plenty of free space in the table.
+
+Clustering
+is the phenomenon which causes probe sequences of distinct keys to merge in some cases. We have made a distinction between primary clustering and secondary clustering.
+
+3 ways:
+The Folding Method
+	An extremely popular hash function is the folding method. The idea is to take all the digits of a key and to combine them, simply by adding them or by applying bitwise-xor to them (e.g. (bitwise-xor 9 4 3 7 5)). In the case of addition, adding 5 digits yields a number between 0 and 45 that can be used immediately as the index in a hash table. The general pattern for folding a key k = d 1 d 2 d 3 . . . d n is h ( k ) = d 1 + d 2 + d 3 + . . . + d n . In practice, folding performs quite poorly. One of the reasons is that the relative order between the digits plays no role whatsoever in the final value returned by the hash function. E.g., h ( 12345 ) = h ( 32145 ) = h ( 54123 ) = . . . . All keys the digits of which are permutations of each other hash to the same home address.
+The Digit Selection Method
+	Avalanche means that a difference of one single bit in the input guarantees that half of the bits in the output are different.
+The Division Method
+The Multiplication Method
